@@ -7,10 +7,7 @@
 [![Course](https://img.shields.io/badge/Course-Robotics%2C%20Dynamics%20%26%20Control%20(RDC)-green)]()
 
 **Course:** Robotics, Dynamics & Control (RDC) — Semester 5  
-**Team 3:**  
-- **Sailakshmi** (Roll No: `2024511019`)  
-- **Navin** (Roll No: `2024511029`)  
-**Assigned Topic:** *Multi-Robot Coordination Using ROS 2 Actions and Services (Task Scheduling)*
+**Topic:** *Multi-Robot Coordination Using ROS 2 Actions and Services (Task Scheduling)*
 
 ---
 
@@ -234,11 +231,4 @@ All comprehensive manuals, component analysis charts, and LaTeX/PDF reports gene
 - **Component Analysis Chart:** `Multi_Robot_Coordination_Component_Analysis_Chart.pdf`
 - **Step-by-Step Execution Guide:** `ROS2_Jazzy_Step_By_Step_Execution_Guide.pdf`
 
----
 
-## 👥 Contributors
-
-- **Sailakshmi** (`2024511019`) — Autonomous Navigation, Robot Kinematics, 3D Workcell Simulation, TF Synchronization.
-- **Navin** (`2024511029`) — Action/Service Interface Design, Priority Scheduling Algorithms, Mutex Safety Layer.
-
-*Submitted for Semester 5 Course: Robotics, Dynamics & Control (RDC).*
