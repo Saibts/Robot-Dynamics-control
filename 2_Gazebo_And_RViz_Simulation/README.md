@@ -1,6 +1,6 @@
-# Folder 2: Gazebo and RViz 3D Workcell Simulation
+# Folder 2: RViz2 3D Workcell Simulation
 
-This folder contains the action-driven 3D physical simulation and visual workcell in **RViz2 & Gazebo Harmonic** for ROS 2 Jazzy.
+This folder contains the action-driven 3D kinematic simulation and visual workcell in **RViz2** for ROS 2 Jazzy.
 
 ## Features
 

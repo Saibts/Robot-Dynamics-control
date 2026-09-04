@@ -1,7 +1,7 @@
 # 🤖 Autonomous Multi-Robot Coordination & Task Scheduling (ROS 2 Jazzy)
 
 [![ROS 2](https://img.shields.io/badge/ROS%202-Jazzy%20Jalisco-3498db?logo=ros)](https://docs.ros.org/en/jazzy/)
-[![Simulator](https://img.shields.io/badge/Simulation-Gazebo%20Harmonic%20%2F%20RViz2-orange)](https://gazebosim.org/)
+[![Visualization](https://img.shields.io/badge/Simulation-RViz2-orange)](https://github.com/ros2/rviz)
 [![OS](https://img.shields.io/badge/OS-Ubuntu%2024.04%20LTS-E95420?logo=ubuntu)](https://ubuntu.com/)
 [![Language](https://img.shields.io/badge/Language-Python%203.12%20%7C%20C%2B%2B-blue)](https://python.org)
 [![Course](https://img.shields.io/badge/Course-Robotics%2C%20Dynamics%20%26%20Control%20(RDC)-green)]()
@@ -21,7 +21,7 @@ This repository delivers an end-to-end, industrial-grade implementation of **Top
 1. **Dynamic Task Scheduling Engine:** Supports **Priority Scheduling** (preemptive/priority-ranked dispatch), **FIFO** (First-In, First-Out), and **Round-Robin** queueing policies.
 2. **Asynchronous ROS 2 Actions with Real-Time Feedback:** Long-duration robot trajectories run over non-blocking ROS 2 Action interfaces (`/navigate_and_pick` and `/ur5_pick_and_assemble`) providing continuous 10–30 Hz progress feedback.
 3. **Mutex-Guarded Shared Collision Zones:** Shared transfer bays are safeguarded via an asynchronous ROS 2 Service lock (`/acquire_transfer_lock`), eliminating race conditions and physical robot collisions.
-4. **Millimeter-Calibrated 3D Visual Simulation:** Fully articulated 3D simulation running in **RViz2 & Gazebo Harmonic** with continuous TF synchronization, physical workpiece parenting transitions, and zero visual jumps during robot-to-robot handover ($< 0.02\text{ mm}$ spatial alignment error).
+4. **Millimeter-Calibrated 3D Visual Simulation:** Fully articulated 3D simulation running in **RViz2** with continuous TF synchronization, physical workpiece parenting transitions, and zero visual jumps during robot-to-robot handover ($< 0.02\text{ mm}$ spatial alignment error).
 
 ---
 
@@ -86,11 +86,11 @@ Robot-Dynamics-control/
 │   ├── literature_survey/               # Academic references & state-of-the-art review
 │   └── *.pdf / *.docx                   # Complete Project Manuals, Guides, & Component Analysis
 │
-├── 2_Gazebo_And_RViz_Simulation/        # 3D Simulation & Visual Articulation Workspace
+├── 2_Gazebo_And_RViz_Simulation/        # 3D RViz Simulation & Articulation Workspace
 │   └── ros2_ws/
 │       └── src/
 │           ├── multi_robot_interfaces/  # Action & Service Definitions
-│           └── multi_robot_gazebo_sim/  # Full 3D URDF, Gazebo worlds, RViz configs, launch files
+│           └── multi_robot_gazebo_sim/  # 3D URDF Workcell, robot meshes, RViz configs, launch files
 │
 ├── project/                             # Staging & reference documents
 ├── .gitignore                           # Git rules (excludes build/, install/, log/, .venv/)
@@ -105,8 +105,7 @@ Robot-Dynamics-control/
 |---|---|
 | **Operating System** | Ubuntu 24.04 LTS (Noble Numbat) |
 | **ROS 2 Version** | ROS 2 Jazzy Jalisco (`/opt/ros/jazzy`) |
-| **Simulator** | Gazebo Harmonic (`gz-sim8`) via `ros_gz_bridge` |
-| **Visualization** | RViz2 |
+| **3D Workcell Simulation** | RViz2 (Robot State Publisher & Kinematic Visual Coordinator) |
 | **Build System** | `colcon` with CMake / Python Ament |
 | **Python** | Python 3.12 |
 
