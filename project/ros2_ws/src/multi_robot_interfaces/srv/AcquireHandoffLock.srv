@@ -1,0 +1,9 @@
+# Request
+string robot_id
+int32 zone_id
+bool request_lock  # true to lock, false to release
+---
+# Response
+bool lock_granted
+string message
+int64 timestamp

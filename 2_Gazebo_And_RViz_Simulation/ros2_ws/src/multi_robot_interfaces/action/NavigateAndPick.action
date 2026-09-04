@@ -1,0 +1,15 @@
+# Goal
+string target_station_id
+float32[3] pickup_coordinates
+int32 priority_level
+---
+# Result
+bool success
+string status_message
+float32 total_navigation_time
+---
+# Feedback
+string current_phase
+float32 percent_complete
+float32 current_pose_x
+float32 current_pose_y

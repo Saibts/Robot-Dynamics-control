@@ -1,0 +1,14 @@
+# Goal
+string task_id
+float32[3] pickup_pose
+float32[3] target_assembly_pose
+bool inspect_quality
+---
+# Result
+bool success
+string completion_code
+float32 execution_time_seconds
+---
+# Feedback
+string joint_trajectory_state
+float32 progress_fraction

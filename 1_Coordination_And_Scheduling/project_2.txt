@@ -1,0 +1,322 @@
+
+--- Page 1 ---
+ Sl. No
+ Team No
+ Team Members
+ ROS (Yes/ No) 
+ TOPIC
+INSTRUCTION
+ TO
+ BE
+ FOLLOWED
+ STRICTLY
+:
+Dear
+ Students,
+    I
+ have
+ shared
+ a
+ part
+ of
+ my
+ PhD
+ research
+ work
+ with
+ you
+ for
+ academic
+ and
+research
+ purposes.
+ Please
+ treat
+ all
+ the
+ information,
+ ideas,
+ data,
+methodologies,
+ designs,
+ results
+ and
+ discussions
+ related
+ to
+ this
+ work
+ as
+strictly
+ conﬁdential.
+    You
+ should
+ not
+ share
+ this
+ material
+ with
+ anyone
+ outside
+ our
+ research
+group,
+ including
+ friends,
+ other
+ students,
+ or
+ through
+ social
+ media,
+ without
+my
+ prior
+ permission.
+ The
+ work
+ should
+ also
+ not
+ be
+ published,
+ presented,
+submitted,
+ or
+ used
+ in
+ any
+ project
+ or
+ paper
+ independently
+ without
+ proper
+discussion
+ and
+ authorization.
+     Please
+ use
+ the
+ shared
+ work
+ only
+ for
+ the
+ speciﬁc
+ tasks
+ assigned
+ to
+ you.
+ If
+you
+ have
+ any
+ questions
+ or
+ wish
+ to
+ discuss
+ the
+ work
+ with
+ someone
+ else,
+please
+ inform
+ me
+ ﬁrst.
+     I
+ expect
+ everyone
+ involved
+ to
+ respect
+ the
+ conﬁdentiality
+ and
+ research
+ethics
+ associated
+ with
+ this
+ PhD
+ work.
+                                      Thank
+ you
+ for
+ your
+ cooperation.
+ Reg No
+ Name of the Student
+ 1
+ 1
+ 2024511003
+ Madhan Adhithya 
+ yes
+ Intelligent Mobile Robot Docking Using LiDAR and Vision
+Fusion
+ 2
+ 2024511008
+ Sathya SA
+ no
+ 3
+ 2024511004
+ Tinku Kannaa
+ yes
+ 4
+ 2024511031
+ Sreekanth
+ no
+ 5
+ 2024511024
+ Jasper
+ no
+ 6
+ 2024511018
+ Sutharshan 
+ no
+ 7
+ 2
+ 2024511013
+ Harshavaradhan
+ yes
+ Coordinate Transformation Between Mobile Robot and Fixed
+Manipulator Using Vision
+ 8
+ 2024511016
+ Yuvaraaja ganesh
+ yes
+ 9
+ 2024511025
+ Karthikeyan
+ yes
+ 10
+ 2024511027
+ Krishna
+ no
+ 11
+ 2024511033
+ Mugilan
+ yes
+ 12
+ 2024511301
+ Raghavendhira
+ no
+ 13 
+ 3
+ 2024511019
+ Sailakshmi
+ yes 
+ Multi-Robot Coordination Using ROS 2 Actions and Services
+ 14
+ 2024511029
+ Navin
+ no
+ 15
+ 4
+ 2024511001
+ Angadh Roy K
+ no
+ ROS2-Based Simulation Framework for Mobile Manipulator and
+Fixed Robot Coordination
+ 16
+ 2024511006
+ Abdiel Zion S
+ yes
+ 17
+ 2024511012
+ Nithishkumar
+ yes
+ 18
+ 2024511015
+ Venkat Ramana L
+ no
+ 19
+ 2024511017
+ Madhesh B S
+ yes
+ 20
+ 2024511304
+ Ashwanth Kumar
+ no
+ 21
+ 5
+ 2024511007
+ Hariharan R
+ no
+ Vision-Based Object Detection and Pose Estimation for
+Robot-to-Robot Material Transfer
+ 22
+ 2024511009
+ Neha
+ no
+ 23
+ 2024511022
+ Tamilarasi
+ no
+ 24
+ 2024511026
+ Arpitha
+ no
+ 25
+ 2024511032
+ Sathyapriyan
+ no
+ 26 
+ 6
+ 2024511028
+ Logeswari E 
+ No 
+ MoveIt 2-Based Coordinated Pick-and-Place Simulation
+ 27
+ 2024511035
+ Deepika M
+ No
+ 28
+ 7
+ 2024511020
+ Nabeeha Naaz H
+ no 
+ Collision-Free Motion Planning for Mobile Manipulator During
+Material Handling
+ 29
+ 2024511021
+ Kaviya Shree Ts
+ yes
+ 30
+ 2024511010
+ Jyothish S
+ yes
+ 31
+ 2024511034
+ Barath KM
+ no
+ 32
+ 8
+ 2024511002
+ ESHAN MUGUNDAN
+ no
+ Digital Twin Simulation for Material Handling
+ 33
+ 2024511011
+ ASWIN V
+ no
+ 34
+ 2024511023
+ LEIGE JONAL L
+ no
+ 35
+ 2024511030
+ KALAIVANAN K
+ no
+ 36
+ 2024511302
+ VIMAL S B
+ no
+ 37
+ 2024511303
+ ABINANTHAN E
+ no 
+ \
+--- Page 2 ---

@@ -1,0 +1,165 @@
+
+--- Page 1 ---
+SL.NO TOPIC NEEDS 
+1 
+Intelligent 
+Mobile Robot 
+Docking Using 
+LiDAR and 
+Vision Fusion 
+Only focus on navigation. 
+No manipulator control. 
+Results: 
+•   Path length 
+•   Docking accuracy 
+•   Time 
+•   SLAM map 
+Suitable if you haven't started manipulator modeling. 
+2 
+Coordinate 
+Transformation 
+Between Mobile 
+Robot and Fixed 
+Manipulator 
+Using Vision 
+Work only on mathematics. 
+Simulation Work 
+• Create URDF models.  
+• Define TF frames.  
+• Implement homogeneous transformation matrices.  
+• Verify end-effector positions in Gazebo/RViz.  
+• Analyze transformation accuracy.  
+Tools 
+• ROS 2  
+• Gazebo  
+• RViz2  
+• MoveIt 2 
+ 
+Research includes: 
+• Camera frame  
+• Marker frame  
+• Robot base frame  
+• Fixed robot frame  
+• Homogeneous Transformation Matrix  
+• TF tree in ROS2  
+Validation: 
+• Compare calculated coordinates with actual measurements. 
+3 
+Multi-Robot 
+Task Scheduling 
+in ROS 2 
+Study task allocation between robots. 
+Example: 
+• Mobile robot transports the object.  
+• Fixed robot performs assembly.  
+Compare scheduling methods: 
+• FIFO  
+• Priority-based  
+• Round Robin  
+Metrics: 
+• Waiting time  
+• Resource utilization  
+Throughput  
+4 
+ROS2-Based 
+Simulation 
+Framework for 
+Mobile 
+Manipulator and 
+Fixed Robot 
+Coordination  
+ 
+ 
+Develop only the simulation. 
+Contents: 
+• URDF models  
+• Gazebo world  
+• MoveIt2  
+• TF  
+• RViz  
+• Basic communication  
+No AI required. 
+Simulation Work: 
+• Build both robot models.  
+• Simulate a shared workspace.  
+• Establish ROS 2 communication.  
+• Coordinate robot tasks.  
+--- Page 2 ---
+• Execute a complete material handling sequence.  
+Tools 
+• ROS 2  
+• Gazebo  
+• RViz2  
+• MoveIt 2 
+5 
+Vision-Based 
+Object Detection 
+and Pose 
+Estimation for 
+Robot-to-Robot 
+Material Transfer 
+Use: 
+• YOLOv8  
+• RGB Camera  
+• OpenCV  
+Measure: 
+• Detection accuracy  
+• FPS  
+• Pose estimation error  
+No manipulation required. 
+6 
+MoveIt 2-Based 
+Coordinated 
+Pick-and-Place 
+Simulation 
+Implement coordinated manipulation with MoveIt 2. 
+Metrics: 
+• Planning time  
+• Trajectory execution time  
+• Path smoothness  
+Success rate 
+7 
+Collision-Free 
+Motion Planning 
+for Mobile 
+Manipulator 
+During Material 
+Handling 
+Use: 
+• MoveIt2  
+• OMPL  
+• Gazebo  
+Compare planners: 
+• RRT  
+• RRT*  
+• PRM  
+Metrics: 
+• Planning time  
+• Path length  
+• Success rate 
+Simulation Work 
+• Generate collision-free trajectories.  
+• Compare different planning algorithms.  
+• Evaluate path quality and execution.  
+Tools 
+• ROS 2  
+• MoveIt 2  
+• Gazebo  
+• OMPL 
+8 
+Digital Twin 
+Simulation for 
+Material 
+Handling 
+Develop a digital twin of a manufacturing cell. 
+Components: 
+• Mobile manipulator  
+• Fixed manipulator  
+• Conveyor  
+• Storage station  
+Evaluate: 
+• Cycle time  
+• Throughput  
+• Robot utilization 
+ 
+ 

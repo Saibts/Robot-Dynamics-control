@@ -1,0 +1,8 @@
+# Request
+string robot_id
+bool close_gripper
+float32 grasp_effort
+---
+# Response
+bool success
+float32 measured_width

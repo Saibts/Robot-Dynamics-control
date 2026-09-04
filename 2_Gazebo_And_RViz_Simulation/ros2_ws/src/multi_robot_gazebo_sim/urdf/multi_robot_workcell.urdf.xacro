@@ -1,0 +1,660 @@
+<?xml version="1.0"?>
+<robot name="multi_robot_workcell" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ================= COLOR MATERIALS ================= -->
+  <material name="robotis_dark"><color rgba="0.20 0.20 0.22 1.0"/></material>
+  <material name="robotis_grey"><color rgba="0.45 0.45 0.48 1.0"/></material>
+  <material name="robotis_tire"><color rgba="0.10 0.10 0.10 1.0"/></material>
+  <material name="ur_pedestal"><color rgba="0.18 0.20 0.22 1.0"/></material>
+  <material name="table_wood"><color rgba="0.55 0.42 0.30 1.0"/></material>
+  <material name="zone_yellow"><color rgba="0.95 0.82 0.05 0.90"/></material>
+  <material name="part_gold"><color rgba="0.92 0.72 0.15 1.0"/></material>
+  <material name="shelf_blue"><color rgba="0.15 0.28 0.50 1.0"/></material>
+  <material name="shelf_steel"><color rgba="0.30 0.35 0.42 1.0"/></material>
+  <material name="chrome_silver"><color rgba="0.82 0.84 0.88 1.0"/></material>
+  <material name="fixture_green"><color rgba="0.15 0.55 0.25 1.0"/></material>
+  <material name="robotiq_blue"><color rgba="0.05 0.55 0.95 1.0"/></material>
+
+  <!-- ================= ROOT WORLD LINK ================= -->
+  <link name="world"/>
+
+  <!-- ================= WORKCELL ENVIRONMENT ================= -->
+  <!-- Stepped Industrial Workbench (Dual Height: Upper Assembly Deck + Lower Transfer Dock) -->
+  <link name="handoff_table">
+    <!-- Main Upper Deck (for UR5 Robot & Assembly Fixture) -->
+    <visual>
+      <origin xyz="0.90 0.0 0.20" rpy="0 0 0"/>
+      <geometry><box size="0.70 1.00 0.40"/></geometry>
+      <material name="table_wood"/>
+    </visual>
+    <collision>
+      <origin xyz="0.90 0.0 0.20" rpy="0 0 0"/>
+      <geometry><box size="0.70 1.00 0.40"/></geometry>
+    </collision>
+
+    <!-- Lower Front Transfer Dock (Ergonomic height for TurtleBot3 Mobile Manipulator) -->
+    <visual>
+      <origin xyz="0.425 0.0 0.125" rpy="0 0 0"/>
+      <geometry><box size="0.25 0.60 0.25"/></geometry>
+      <material name="table_wood"/>
+    </visual>
+    <collision>
+      <origin xyz="0.425 0.0 0.125" rpy="0 0 0"/>
+      <geometry><box size="0.25 0.60 0.25"/></geometry>
+    </collision>
+
+    <!-- Heavy Industrial Steel Frame Trim -->
+    <visual>
+      <origin xyz="0.30 0.0 0.125" rpy="0 0 0"/>
+      <geometry><box size="0.01 0.60 0.25"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+  </link>
+  <joint name="world_to_handoff_table" type="fixed">
+    <parent link="world"/>
+    <child link="handoff_table"/>
+    <origin xyz="0.0 0.0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Shared Mutex Safety Zone (Bright Yellow Pad on Lower Transfer Dock) -->
+  <link name="shared_safety_zone">
+    <visual>
+      <origin xyz="0 0 0.002" rpy="0 0 0"/>
+      <geometry><box size="0.22 0.50 0.004"/></geometry>
+      <material name="zone_yellow"/>
+    </visual>
+  </link>
+  <joint name="table_to_zone" type="fixed">
+    <parent link="handoff_table"/>
+    <child link="shared_safety_zone"/>
+    <origin xyz="0.425 0.0 0.25" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Transfer Dock Receptacle Pad (Where mobile manipulator places the raw part) -->
+  <link name="transfer_receptacle">
+    <visual>
+      <origin xyz="0 0 0.008" rpy="0 0 0"/>
+      <geometry><box size="0.08 0.08 0.016"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+  </link>
+  <joint name="zone_to_receptacle" type="fixed">
+    <parent link="shared_safety_zone"/>
+    <child link="transfer_receptacle"/>
+    <origin xyz="0.0 0.0 0.004" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Assembly Jig / Fixture on Upper Table Deck (Where UR5 performs assembly) -->
+  <link name="assembly_jig">
+    <!-- Fixture Baseplate -->
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry><box size="0.14 0.14 0.03"/></geometry>
+      <material name="fixture_green"/>
+    </visual>
+    <!-- Left Clamp Guide Post -->
+    <visual>
+      <origin xyz="-0.05 0 0.04" rpy="0 0 0"/>
+      <geometry><box size="0.02 0.10 0.05"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+    <!-- Right Clamp Guide Post -->
+    <visual>
+      <origin xyz="0.05 0 0.04" rpy="0 0 0"/>
+      <geometry><box size="0.02 0.10 0.05"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+  </link>
+  <joint name="table_to_jig" type="fixed">
+    <parent link="handoff_table"/>
+    <child link="assembly_jig"/>
+    <origin xyz="0.75 0.20 0.40" rpy="0 0 0"/>
+  </joint>
+
+
+  <!-- Remote Multi-Tier Storage Rack (Open Shelves at Accessible Heights) -->
+  <link name="storage_shelf">
+    <!-- Four Corner Upright Posts -->
+    <visual>
+      <origin xyz="-0.18 -0.38 0.35" rpy="0 0 0"/>
+      <geometry><box size="0.04 0.04 0.70"/></geometry>
+      <material name="shelf_steel"/>
+    </visual>
+    <visual>
+      <origin xyz="0.18 -0.38 0.35" rpy="0 0 0"/>
+      <geometry><box size="0.04 0.04 0.70"/></geometry>
+      <material name="shelf_steel"/>
+    </visual>
+    <visual>
+      <origin xyz="-0.18 0.38 0.35" rpy="0 0 0"/>
+      <geometry><box size="0.04 0.04 0.70"/></geometry>
+      <material name="shelf_steel"/>
+    </visual>
+    <visual>
+      <origin xyz="0.18 0.38 0.35" rpy="0 0 0"/>
+      <geometry><box size="0.04 0.04 0.70"/></geometry>
+      <material name="shelf_steel"/>
+    </visual>
+
+    <!-- Lower Tier: AMR Pick Shelf (Open ledge at Z = 0.25m) -->
+    <visual>
+      <origin xyz="0.0 0.0 0.25" rpy="0 0 0"/>
+      <geometry><box size="0.40 0.80 0.02"/></geometry>
+      <material name="shelf_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.25" rpy="0 0 0"/>
+      <geometry><box size="0.40 0.80 0.02"/></geometry>
+    </collision>
+
+    <!-- Upper Tier: Storage Shelf (Z = 0.60m) -->
+    <visual>
+      <origin xyz="0.0 0.0 0.60" rpy="0 0 0"/>
+      <geometry><box size="0.40 0.80 0.02"/></geometry>
+      <material name="shelf_blue"/>
+    </visual>
+
+    <!-- Raw Inventory Part 2 on Lower Shelf (Secondary Stock) -->
+    <visual>
+      <origin xyz="-0.12 -0.20 0.285" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.02" length="0.05"/></geometry>
+      <material name="part_gold"/>
+    </visual>
+    <!-- Raw Inventory Part 3 on Upper Shelf -->
+    <visual>
+      <origin xyz="-0.12 0.20 0.635" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.02" length="0.05"/></geometry>
+      <material name="part_gold"/>
+    </visual>
+  </link>
+  <joint name="world_to_storage_shelf" type="fixed">
+    <parent link="world"/>
+    <child link="storage_shelf"/>
+    <origin xyz="1.90 1.20 0" rpy="0 0 0"/>
+  </joint>
+
+
+  <!-- ================= FIXED MANIPULATOR (UNIVERSAL ROBOTS UR5) ================= -->
+  <!-- Industrial Pedestal bolted to Main Workbench Deck -->
+  <link name="ur5_base_pedestal">
+    <visual>
+      <origin xyz="0 0 0.06" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.10" length="0.12"/></geometry>
+      <material name="ur_pedestal"/>
+    </visual>
+  </link>
+  <joint name="table_to_ur5_pedestal" type="fixed">
+    <parent link="handoff_table"/>
+    <child link="ur5_base_pedestal"/>
+    <origin xyz="0.90 0.0 0.40" rpy="0 0 0"/>
+  </joint>
+
+  <!-- UR5 Link 0: Base Link -->
+  <link name="ur5_base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 3.14159265"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/base.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="pedestal_to_ur5_base" type="fixed">
+    <parent link="ur5_base_pedestal"/>
+    <child link="ur5_base_link"/>
+    <origin xyz="0 0 0.12" rpy="0 0 0"/>
+  </joint>
+
+  <!-- UR5 Link 1: Shoulder Link -->
+  <link name="ur5_shoulder_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 3.14159265"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/shoulder.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_shoulder_pan_joint" type="revolute">
+    <parent link="ur5_base_link"/>
+    <child link="ur5_shoulder_link"/>
+    <origin xyz="0 0 0.089159" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="150" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Link 2: Upper Arm Link -->
+  <link name="ur5_upper_arm_link">
+    <visual>
+      <origin xyz="0 0 0.13585" rpy="1.5707963 0 -1.5707963"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/upperarm.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_shoulder_lift_joint" type="revolute">
+    <parent link="ur5_shoulder_link"/>
+    <child link="ur5_upper_arm_link"/>
+    <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="150" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Link 3: Forearm Link -->
+  <link name="ur5_forearm_link">
+    <visual>
+      <origin xyz="0 0 0.0165" rpy="1.5707963 0 -1.5707963"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/forearm.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_elbow_joint" type="revolute">
+    <parent link="ur5_upper_arm_link"/>
+    <child link="ur5_forearm_link"/>
+    <origin xyz="-0.425 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="150" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Link 4: Wrist 1 Link -->
+  <link name="ur5_wrist_1_link">
+    <visual>
+      <origin xyz="0 0 -0.093" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/wrist1.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_wrist_1_joint" type="revolute">
+    <parent link="ur5_forearm_link"/>
+    <child link="ur5_wrist_1_link"/>
+    <origin xyz="-0.39225 0 0.10915" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="50" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Link 5: Wrist 2 Link -->
+  <link name="ur5_wrist_2_link">
+    <visual>
+      <origin xyz="0 0 -0.095" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/wrist2.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_wrist_2_joint" type="revolute">
+    <parent link="ur5_wrist_1_link"/>
+    <child link="ur5_wrist_2_link"/>
+    <origin xyz="0 -0.09465 0" rpy="1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="50" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Link 6: Wrist 3 Link -->
+  <link name="ur5_wrist_3_link">
+    <visual>
+      <origin xyz="0 0 -0.0818" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/ur5/visual/wrist3.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ur5_wrist_3_joint" type="revolute">
+    <parent link="ur5_wrist_2_link"/>
+    <child link="ur5_wrist_3_link"/>
+    <origin xyz="0 0 0.0823" rpy="-1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.28" upper="6.28" effort="50" velocity="3.14"/>
+  </joint>
+
+  <!-- UR5 Tool Flange Interface Frame (Flush to circular output face of wrist 3) -->
+  <link name="ur5_tool_flange"/>
+  <joint name="ur5_wrist_to_flange" type="fixed">
+    <parent link="ur5_wrist_3_link"/>
+    <child link="ur5_tool_flange"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Sleek Compact Industrial Electric 2-Finger Gripper on UR5 Tool Flange -->
+  <link name="ur5_gripper_base">
+    <!-- 1. Precision ISO 9409-1-50 Tool Flange Adapter Disc (Matches UR5 Wrist 3 face) -->
+    <visual>
+      <origin xyz="0 0 0.003" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0375" length="0.006"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+    <!-- 2. Collar Taper Ring -->
+    <visual>
+      <origin xyz="0 0 0.008" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.034" length="0.004"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <!-- 3. Smart Status LED Indicator Band (Signature Cyan Glow) -->
+    <visual>
+      <origin xyz="0 0 0.012" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0345" length="0.004"/></geometry>
+      <material name="robotiq_blue"/>
+    </visual>
+    <!-- 4. Cylindrical Servo Actuator Body (Sleek Compact Barrel) -->
+    <visual>
+      <origin xyz="0 0 0.026" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.032" length="0.024"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <!-- 5. Milled Aluminum Side Accent Brackets -->
+    <visual>
+      <origin xyz="0 0 0.026" rpy="0 0 0"/>
+      <geometry><box size="0.056 0.038 0.020"/></geometry>
+      <material name="robotis_grey"/>
+    </visual>
+    <!-- 6. Compact Palm Housing with Linear Guide (Z: 0.038 to 0.052) -->
+    <visual>
+      <origin xyz="0 0 0.045" rpy="0 0 0"/>
+      <geometry><box size="0.054 0.032 0.014"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <!-- 7. Stainless Linear Slide Guide Rail -->
+    <visual>
+      <origin xyz="0 0 0.046" rpy="0 1.5707963 0"/>
+      <geometry><cylinder radius="0.0025" length="0.048"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+  </link>
+  <joint name="flange_to_ur5_gripper" type="fixed">
+    <parent link="ur5_tool_flange"/>
+    <child link="ur5_gripper_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Left Finger Jaw -->
+  <link name="ur5_finger_left">
+    <!-- Slider Carriage -->
+    <visual>
+      <origin xyz="0 0 0.004" rpy="0 0 0"/>
+      <geometry><box size="0.008 0.018 0.008"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <!-- Aluminum Knuckle Arm -->
+    <visual>
+      <origin xyz="0 0 0.019" rpy="0 0 0"/>
+      <geometry><box size="0.006 0.014 0.024"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+    <!-- Inward Clamping Rubber Pad (TCP at Z = 0.023 rel, Base Z = 0.075) -->
+    <visual>
+      <origin xyz="0.004 0 0.023" rpy="0 0 0"/>
+      <geometry><box size="0.002 0.012 0.020"/></geometry>
+      <material name="robotis_tire"/>
+    </visual>
+    <!-- Fingertip Bevel -->
+    <visual>
+      <origin xyz="0.001 0 0.032" rpy="0 0 0"/>
+      <geometry><box size="0.004 0.012 0.004"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+  </link>
+  <joint name="ur5_finger_left_joint" type="prismatic">
+    <parent link="ur5_gripper_base"/>
+    <child link="ur5_finger_left"/>
+    <origin xyz="-0.014 0 0.052" rpy="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit lower="0.0" upper="0.025" effort="50" velocity="0.5"/>
+  </joint>
+
+  <!-- Right Finger Jaw -->
+  <link name="ur5_finger_right">
+    <!-- Slider Carriage -->
+    <visual>
+      <origin xyz="0 0 0.004" rpy="0 0 0"/>
+      <geometry><box size="0.008 0.018 0.008"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <!-- Aluminum Knuckle Arm -->
+    <visual>
+      <origin xyz="0 0 0.019" rpy="0 0 0"/>
+      <geometry><box size="0.006 0.014 0.024"/></geometry>
+      <material name="chrome_silver"/>
+    </visual>
+    <!-- Inward Clamping Rubber Pad (TCP at Z = 0.023 rel, Base Z = 0.075) -->
+    <visual>
+      <origin xyz="-0.004 0 0.023" rpy="0 0 0"/>
+      <geometry><box size="0.002 0.012 0.020"/></geometry>
+      <material name="robotis_tire"/>
+    </visual>
+    <!-- Fingertip Bevel -->
+    <visual>
+      <origin xyz="-0.001 0 0.032" rpy="0 0 0"/>
+      <geometry><box size="0.004 0.012 0.004"/></geometry>
+      <material name="robotis_dark"/>
+    </visual>
+  </link>
+  <joint name="ur5_finger_right_joint" type="prismatic">
+    <parent link="ur5_gripper_base"/>
+    <child link="ur5_finger_right"/>
+    <origin xyz="0.014 0 0.052" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0.0" upper="0.025" effort="50" velocity="0.5"/>
+  </joint>
+
+
+  <!-- ================= MOBILE MANIPULATOR: TURTLEBOT3 WAFFLE PI + OPENMANIPULATOR-X ================= -->
+  <!-- Planar Virtual Joints for autonomous floor navigation -->
+  <link name="tb3_virtual_x"/>
+  <joint name="tb3_x_joint" type="prismatic">
+    <parent link="world"/>
+    <child link="tb3_virtual_x"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-10" upper="10" effort="500" velocity="2.0"/>
+  </joint>
+
+  <link name="tb3_virtual_y"/>
+  <joint name="tb3_y_joint" type="prismatic">
+    <parent link="tb3_virtual_x"/>
+    <child link="tb3_virtual_y"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-10" upper="10" effort="500" velocity="2.0"/>
+  </joint>
+
+  <link name="tb3_base_footprint"/>
+  <joint name="tb3_yaw_joint" type="continuous">
+    <parent link="tb3_virtual_y"/>
+    <child link="tb3_base_footprint"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- TurtleBot3 Waffle Pi Base Link -->
+  <link name="tb3_base_link">
+    <visual>
+      <origin xyz="-0.064 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/turtlebot3/bases/waffle_pi_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_dark"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.064 0 0.047" rpy="0 0 0"/>
+      <geometry><box size="0.266 0.266 0.094"/></geometry>
+    </collision>
+  </link>
+  <joint name="tb3_base_joint" type="fixed">
+    <parent link="tb3_base_footprint"/>
+    <child link="tb3_base_link"/>
+    <origin xyz="0 0 0.010" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TurtleBot3 Left Wheel -->
+  <link name="tb3_wheel_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/turtlebot3/wheels/left_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_tire"/>
+    </visual>
+  </link>
+  <joint name="tb3_wheel_left_joint" type="continuous">
+    <parent link="tb3_base_link"/>
+    <child link="tb3_wheel_left_link"/>
+    <origin xyz="0.0 0.144 0.023" rpy="-1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- TurtleBot3 Right Wheel -->
+  <link name="tb3_wheel_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/turtlebot3/wheels/right_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_tire"/>
+    </visual>
+  </link>
+  <joint name="tb3_wheel_right_joint" type="continuous">
+    <parent link="tb3_base_link"/>
+    <child link="tb3_wheel_right_link"/>
+    <origin xyz="0.0 -0.144 0.023" rpy="-1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- TurtleBot3 360 LiDAR Sensor -->
+  <link name="tb3_lds">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/turtlebot3/sensors/lds.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_dark"/>
+    </visual>
+  </link>
+  <joint name="tb3_lds_joint" type="fixed">
+    <parent link="tb3_base_link"/>
+    <child link="tb3_lds"/>
+    <origin xyz="-0.064 0 0.122" rpy="0 0 0"/>
+  </joint>
+
+
+  <!-- ================= OPENMANIPULATOR-X 4-DOF ROBOTIC ARM ================= -->
+  <!-- OpenManipulator Link 1: Base Mount on TB3 Deck -->
+  <link name="om_link1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/link1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="tb3_to_om" type="fixed">
+    <parent link="tb3_base_link"/>
+    <child link="om_link1"/>
+    <origin xyz="-0.010 0.0 0.095" rpy="0 0 0"/>
+  </joint>
+
+  <!-- OpenManipulator Link 2: Base Yaw Turret -->
+  <link name="om_link2">
+    <visual>
+      <origin xyz="0 0 0.019" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/link2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_joint1" type="revolute">
+    <parent link="om_link1"/>
+    <child link="om_link2"/>
+    <origin xyz="0.012 0.0 0.0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="4.8"/>
+  </joint>
+
+  <!-- OpenManipulator Link 3: Shoulder Pitch -->
+  <link name="om_link3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/link3.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_joint2" type="revolute">
+    <parent link="om_link2"/>
+    <child link="om_link3"/>
+    <origin xyz="0.0 0.0 0.0595" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5" upper="1.5" effort="100" velocity="4.8"/>
+  </joint>
+
+  <!-- OpenManipulator Link 4: Elbow Pitch -->
+  <link name="om_link4">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/link4.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_joint3" type="revolute">
+    <parent link="om_link3"/>
+    <child link="om_link4"/>
+    <origin xyz="0.024 0.0 0.128" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5" upper="1.4" effort="100" velocity="4.8"/>
+  </joint>
+
+  <!-- OpenManipulator Link 5: Wrist Pitch -->
+  <link name="om_link5">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/link5.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_joint4" type="revolute">
+    <parent link="om_link4"/>
+    <child link="om_link5"/>
+    <origin xyz="0.124 0.0 0.0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.7" upper="1.97" effort="100" velocity="4.8"/>
+  </joint>
+
+  <!-- OpenManipulator Gripper Left Finger -->
+  <link name="om_gripper_left">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/gripper_left_palm.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_gripper_left_joint" type="prismatic">
+    <parent link="om_link5"/>
+    <child link="om_gripper_left"/>
+    <origin xyz="0.0817 0.015 0.0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.011" upper="0.02" effort="100" velocity="4.8"/>
+  </joint>
+
+  <!-- OpenManipulator Gripper Right Finger -->
+  <link name="om_gripper_right">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://multi_robot_gazebo_sim/meshes/open_manipulator_x/gripper_right_palm.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="robotis_grey"/>
+    </visual>
+  </link>
+  <joint name="om_gripper_right_joint" type="prismatic">
+    <parent link="om_link5"/>
+    <child link="om_gripper_right"/>
+    <origin xyz="0.0817 -0.015 0.0" rpy="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <limit lower="-0.011" upper="0.02" effort="100" velocity="4.8"/>
+  </joint>
+
+</robot>

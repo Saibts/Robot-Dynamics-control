@@ -1,0 +1,28 @@
+# ROS 2 Build, Install, and Log artifacts
+build/
+install/
+log/
+**/build/
+**/install/
+**/log/
+
+# Python virtual environments & caches
+.venv/
+**/.venv/
+venv/
+**/venv/
+env/
+**/env/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
