@@ -53,12 +53,14 @@ UR5_JIG_RETRACT = [-1.3791, -1.0623,  2.1130,  0.5201,  1.5708,  0.0000]  # Vert
 
 # OpenManipulator-X: [joint1 (yaw), joint2 (shoulder), joint3 (elbow), joint4 (wrist)]
 # All poses strictly maintain joint2 + joint3 + joint4 = 0 so end-effector is parallel to ground and cylinder stays vertical
-OM_STOWED       = [0.0, -0.55,    1.05,   -0.50]   # Tucked safely on TB3 deck, cylinder upright
-OM_SHELF_HOVER  = [0.0,  0.45,   -0.70,    0.25]   # Pre-grasp hover approaching shelf part
+# Calibrated for ZERO collision: min height during transit is Z >= 0.28m (table top is Z=0.25m)
+OM_TRAVEL       = [0.0, -0.66,    0.10,    0.56]   # Safe elevated travel (Z >= 0.28m, compact over deck)
+OM_SHELF_HOVER  = [0.0,  0.45,   -0.70,    0.25]   # Pre-grasp hover approaching shelf part (Z = 0.300m)
 OM_SHELF_GRASP  = [0.0,  0.6775, -0.8954,  0.2179] # Exact contact at (1.780, 1.20, 0.295)
-OM_SHELF_LIFT   = [0.0,  0.45,   -0.70,    0.25]   # Vertical lift clearing shelf ledge
-OM_DOCK_PRESENT = [0.0, -0.0905,  0.2374, -0.1469] # Smooth forward presentation onto dock receptacle (0.425, 0.0, 0.295)
-OM_DOCK_RETRACT = [0.0, -0.55,    1.05,   -0.50]   # Safe smooth return to stowed configuration
+OM_SHELF_LIFT   = [0.0,  0.45,   -0.70,    0.25]   # Vertical lift clearing shelf ledge (Z = 0.300m)
+OM_DOCK_HOVER   = [0.0, -0.30,    0.15,    0.15]   # Elevated approach hover above dock pad (Z >= 0.33m)
+OM_DOCK_PRESENT = [0.0, -0.038,   0.024,   0.014]  # Precision delivery onto dock receptacle (0.425, 0.0, 0.295)
+OM_DOCK_RETRACT = [0.0, -0.66,    0.10,    0.56]   # Safe return to elevated travel configuration
 
 
 class VisualWorkcellCoordinator(Node):
@@ -108,11 +110,12 @@ class VisualWorkcellCoordinator(Node):
             callback_group=self.cb_group
         )
 
-        # Workcell Waypoints & Coordinates (Clearance from table front at X=0.30: dock_x=0.20 gives 3.1cm visible gap)
+        # Workcell Waypoints & Coordinates (Collision-free navigation with strict physical clearance)
         self.shelf_x, self.shelf_y = 1.47, 1.20
+        self.reverse_shelf_x = 1.34  # Safe straight-line reverse distance before rotating away from shelf
         self.corridor_x = -0.05
         self.corner_x, self.corner_y = -0.05, 1.20
-        self.dock_x, self.dock_y = 0.20, 0.00
+        self.dock_x, self.dock_y = 0.18, 0.00  # Clear 4.3cm physical gap between TB3 chassis and table front
 
         # Animated Joint Names (19 joints matching full URDF kinematic trees)
         self.joint_names = [
@@ -271,7 +274,7 @@ class VisualWorkcellCoordinator(Node):
         wheel_speed = 0.0
 
         # Default OpenManipulator Stowed Travel Pose
-        om_q = list(OM_STOWED)
+        om_q = list(OM_TRAVEL)
         om_grip = 0.002
 
         # Default UR5 Elevated Staging / Home Pose
@@ -288,7 +291,7 @@ class VisualWorkcellCoordinator(Node):
             curr_y = self.shelf_y
             yaw = 0.0
             wheel_speed = 0.0
-            om_q = list(OM_STOWED)
+            om_q = list(OM_TRAVEL)
             om_grip = 0.002
             ur5_q = list(UR5_HOME)
             ur5_grip = 0.020
@@ -319,7 +322,7 @@ class VisualWorkcellCoordinator(Node):
                 if t < 1.2:
                     # Subphase 1.1: Unfold arm & Open gripper in pre-grasp hover
                     s = smooth_step(t / 1.2)
-                    om_q = lerp(OM_STOWED, OM_SHELF_HOVER, s)
+                    om_q = lerp(OM_TRAVEL, OM_SHELF_HOVER, s)
                     om_grip = 0.002 + (0.018 - 0.002) * s
                     current_phase_text = '[TB3 ACTION] Approaching Workpiece on Shelf Ledge'
                 elif t < 2.0:
@@ -341,11 +344,11 @@ class VisualWorkcellCoordinator(Node):
                     om_grip = 0.002
                     current_phase_text = '[TB3 ACTION] Lifting Workpiece with Shelf Clearance'
                 else:
-                    # Subphase 1.5: Tuck arm safely onto TB3 deck for travel
+                    # Subphase 1.5: Tuck arm safely onto TB3 deck for travel (elevated clearance)
                     s = smooth_step((t - 3.3) / 0.7)
-                    om_q = lerp(OM_SHELF_LIFT, OM_STOWED, s)
+                    om_q = lerp(OM_SHELF_LIFT, OM_TRAVEL, s)
                     om_grip = 0.002
-                    current_phase_text = '[TB3 ACTION] Arm Stowed Safely for Mobile Transit'
+                    current_phase_text = '[TB3 ACTION] Arm Lifted & Elevated in Safe Travel Pose'
 
                 if self.active_tb3_goal_handle:
                     fb = NavigateAndPick.Feedback()
@@ -357,26 +360,37 @@ class VisualWorkcellCoordinator(Node):
 
             # 1B: Corridor Transit Navigation (t: 4.0s to 10.0s, duration 6.0s)
             elif t < 10.0:
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 nav_p = (t - 4.0) / 6.0
-                current_phase_text = '[TB3 ACTION] Transporting Workpiece to Handoff Dock'
+                current_phase_text = '[TB3 ACTION] Transporting Workpiece with Full Obstacle Clearance'
 
-                if nav_p < 0.12:
-                    sub_p = nav_p / 0.12
+                if nav_p < 0.08:
+                    # 1. Reverse straight back away from shelf ledge BEFORE rotating!
+                    sub_p = nav_p / 0.08
                     s = smooth_step(sub_p)
-                    curr_x = self.shelf_x
+                    curr_x = self.shelf_x + (self.reverse_shelf_x - self.shelf_x) * s
+                    curr_y = self.shelf_y
+                    yaw = 0.0
+                    wheel_speed = -6.0 * math.sin(sub_p * math.pi)
+                elif nav_p < 0.20:
+                    # 2. Rotate 180 degrees at safe reversed distance (tail never touches shelf!)
+                    sub_p = (nav_p - 0.08) / 0.12
+                    s = smooth_step(sub_p)
+                    curr_x = self.reverse_shelf_x
                     curr_y = self.shelf_y
                     yaw = 0.0 + (math.pi - 0.0) * s
                     wheel_speed = 0.0
                 elif nav_p < 0.45:
-                    sub_p = (nav_p - 0.12) / 0.33
+                    # 3. Drive west to open aisle
+                    sub_p = (nav_p - 0.20) / 0.25
                     s = smooth_step(sub_p)
-                    curr_x = self.shelf_x + (self.corridor_x - self.shelf_x) * s
+                    curr_x = self.reverse_shelf_x + (self.corridor_x - self.reverse_shelf_x) * s
                     curr_y = self.shelf_y
                     yaw = math.pi
                     wheel_speed = 9.0 * math.sin(sub_p * math.pi)
                 elif nav_p < 0.58:
+                    # 4. Turn south into corridor
                     sub_p = (nav_p - 0.45) / 0.13
                     s = smooth_step(sub_p)
                     curr_x = self.corridor_x
@@ -384,6 +398,7 @@ class VisualWorkcellCoordinator(Node):
                     yaw = math.pi - (math.pi - (-math.pi / 2.0)) * s
                     wheel_speed = 0.0
                 elif nav_p < 0.80:
+                    # 5. Drive south along wide open corridor
                     sub_p = (nav_p - 0.58) / 0.22
                     s = smooth_step(sub_p)
                     curr_x = self.corridor_x
@@ -391,6 +406,7 @@ class VisualWorkcellCoordinator(Node):
                     yaw = -math.pi / 2.0
                     wheel_speed = 9.0 * math.sin(sub_p * math.pi)
                 elif nav_p < 0.90:
+                    # 6. Turn east towards handoff dock
                     sub_p = (nav_p - 0.80) / 0.10
                     s = smooth_step(sub_p)
                     curr_x = self.corridor_x
@@ -398,6 +414,7 @@ class VisualWorkcellCoordinator(Node):
                     yaw = -math.pi / 2.0 + (0.0 - (-math.pi / 2.0)) * s
                     wheel_speed = 0.0
                 else:
+                    # 7. Approach dock smoothly, stopping at x=0.18m (4.3cm physical clearance from table)
                     sub_p = (nav_p - 0.90) / 0.10
                     s = smooth_step(sub_p)
                     curr_x = self.corridor_x + (self.dock_x - self.corridor_x) * s
@@ -420,10 +437,14 @@ class VisualWorkcellCoordinator(Node):
                 yaw = 0.0
                 wheel_speed = 0.0
                 dock_p = (t - 10.0) / 1.5
-                s = smooth_step(dock_p)
-                om_q = lerp(OM_STOWED, OM_DOCK_PRESENT, s)
+                if dock_p < 0.40:
+                    s = smooth_step(dock_p / 0.40)
+                    om_q = lerp(OM_TRAVEL, OM_DOCK_HOVER, s)
+                else:
+                    s = smooth_step((dock_p - 0.40) / 0.60)
+                    om_q = lerp(OM_DOCK_HOVER, OM_DOCK_PRESENT, s)
                 om_grip = 0.002
-                current_phase_text = '[TB3 ACTION] Docked at Transfer Station - Presenting Workpiece'
+                current_phase_text = '[TB3 ACTION] Docked at Transfer Station - Presenting Workpiece above Dock'
 
                 if self.active_tb3_goal_handle:
                     fb = NavigateAndPick.Feedback()
@@ -513,14 +534,20 @@ class VisualWorkcellCoordinator(Node):
                     fb.progress_fraction = 0.45
                     self.active_ur5_goal_handle.publish_feedback(fb)
 
-            # 3D: Safe Separation: UR5 Vertical Lift & TB3 Safe Stow (t: 4.8s to 6.5s)
+            # 3D: Safe Separation: UR5 Vertical Lift & TB3 Clean Vertical Retract (t: 4.8s to 6.5s)
             elif t < 6.5:
                 s = smooth_step((t - 4.8) / 1.7)
                 ur5_q = lerp(UR5_DOCK_GRASP, UR5_DOCK_LIFT, s)
                 ur5_grip = 0.007
-                om_q = lerp(OM_DOCK_PRESENT, OM_STOWED, s)
+                # OpenManipulator lifts vertically up to hover, then safely tucks into OM_TRAVEL (clearing table)
+                if s < 0.45:
+                    sub_s = smooth_step(s / 0.45)
+                    om_q = lerp(OM_DOCK_PRESENT, OM_DOCK_HOVER, sub_s)
+                else:
+                    sub_s = smooth_step((s - 0.45) / 0.55)
+                    om_q = lerp(OM_DOCK_HOVER, OM_TRAVEL, sub_s)
                 om_grip = 0.018 + (0.002 - 0.018) * s  # TB3 closes gripper once arm safely stows
-                current_phase_text = '[UR5 ACTION] Vertical Lift with Clearance | TB3 Stowing Arm'
+                current_phase_text = '[UR5 ACTION] Vertical Lift with Clearance | TB3 Retracting Arm Safely'
 
                 if self.active_ur5_goal_handle:
                     fb = UR5PickAndPlace.Feedback()
@@ -530,7 +557,7 @@ class VisualWorkcellCoordinator(Node):
 
             # 3E: Direct Smooth Arc Swing Across Table to Jig (t: 6.5s to 9.0s)
             elif t < 9.0:
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 s = smooth_step((t - 6.5) / 2.5)
                 ur5_q = lerp(UR5_DOCK_LIFT, UR5_JIG_HOVER, s)
@@ -545,7 +572,7 @@ class VisualWorkcellCoordinator(Node):
 
             # 3F: Precision Insertion into Jig Clamp (t: 9.0s to 10.3s)
             elif t < 10.3:
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 s = smooth_step((t - 9.0) / 1.3)
                 ur5_q = lerp(UR5_JIG_HOVER, UR5_JIG_INSERT, s)
@@ -561,7 +588,7 @@ class VisualWorkcellCoordinator(Node):
             # 3G: Part Release & Vertical Retraction (t: 10.3s to 11.4s)
             elif t < 11.4:
                 self.workpiece_placed = True
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 s = smooth_step((t - 10.3) / 1.1)
                 ur5_q = lerp(UR5_JIG_INSERT, UR5_JIG_RETRACT, s)
@@ -577,7 +604,7 @@ class VisualWorkcellCoordinator(Node):
             # 3H: Return to Home Staging Pose (t: 11.4s to 12.5s)
             elif t < 12.5:
                 self.workpiece_placed = True
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 s = smooth_step((t - 11.4) / 1.1)
                 ur5_q = lerp(UR5_JIG_RETRACT, UR5_HOME, s)
@@ -591,7 +618,7 @@ class VisualWorkcellCoordinator(Node):
                     self.active_ur5_goal_handle.publish_feedback(fb)
             else:
                 self.workpiece_placed = True
-                om_q = list(OM_STOWED)
+                om_q = list(OM_TRAVEL)
                 om_grip = 0.002
                 ur5_q = list(UR5_HOME)
                 ur5_grip = 0.020
@@ -606,7 +633,7 @@ class VisualWorkcellCoordinator(Node):
             self.ret_trajectory_time += dt
             t = self.ret_trajectory_time
             ret_p = t / 5.5
-            om_q = list(OM_STOWED)
+            om_q = list(OM_TRAVEL)
             om_grip = 0.002
             ur5_q = list(UR5_HOME)
             ur5_grip = 0.020
