@@ -1,0 +1,132 @@
+================================================================================
+           ROBOTICS, DYNAMICS & CONTROL (RDC) - COMMANDS CHEAT SHEET
+================================================================================
+Project Location: ~/Desktop/RDC_project
+ROS 2 Version:    ROS 2 Jazzy Jalisco
+OS:               Ubuntu 24.04 LTS
+
+================================================================================
+1. OPEN PROJECT
+================================================================================
+# Open project in VS Code:
+code ~/Desktop/RDC_project
+
+# Navigate to project root in Terminal:
+cd ~/Desktop/RDC_project
+
+
+================================================================================
+2. BUILD WORKSPACES (Run after making code changes)
+================================================================================
+# Build Workspace 1 (Coordination & Task Scheduling):
+cd ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+
+# Build Workspace 2 (3D Gazebo & RViz Simulation):
+cd ~/Desktop/RDC_project/2_Gazebo_And_RViz_Simulation/ros2_ws
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+
+
+================================================================================
+3. RUN MODE A: FULL 3D RVIZ AUTONOMOUS SIMULATION (Hands-Free Demo)
+================================================================================
+# Single terminal command for hands-free pick, transport, dock, and assembly:
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/2_Gazebo_And_RViz_Simulation/ros2_ws/install/setup.bash
+ros2 launch multi_robot_gazebo_sim workcell_simulation.launch.py autonomous_demo:=true
+
+
+================================================================================
+4. RUN MODE B: INTERACTIVE TASK SCHEDULING WITH 3D RVIZ (Multi-Terminal)
+================================================================================
+# TERMINAL 1 — Launch 3D RViz Workcell (waits for tasks):
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/2_Gazebo_And_RViz_Simulation/ros2_ws/install/setup.bash
+ros2 launch multi_robot_gazebo_sim workcell_simulation.launch.py
+
+# TERMINAL 2 — Launch Central Coordinator (Task Scheduler):
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws/install/setup.bash
+# Run in PRIORITY Mode (dispatches highest priority tasks first):
+ros2 run multi_robot_coordination coordinator --ros-args -p scheduler_mode:=PRIORITY
+
+# (Optional: Run in FIFO Mode instead)
+# ros2 run multi_robot_coordination coordinator --ros-args -p scheduler_mode:=FIFO
+
+# (Optional: Run in ROUND_ROBIN Mode instead)
+# ros2 run multi_robot_coordination coordinator --ros-args -p scheduler_mode:=ROUND_ROBIN
+
+# TERMINAL 3 — Submit Demonstration Tasks Batch (Urgent, Normal, High):
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws/install/setup.bash
+ros2 run multi_robot_coordination submit_tasks
+
+
+================================================================================
+5. RUN MODE C: HEADLESS MOCK SYSTEM (All-In-One, No 3D GUI)
+================================================================================
+# TERMINAL 1 — Launch Mutex Lock Server, Action Servers & Coordinator:
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws/install/setup.bash
+ros2 launch multi_robot_coordination multi_robot_system.launch.py
+
+# TERMINAL 2 — Submit Tasks Batch:
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws/install/setup.bash
+ros2 run multi_robot_coordination submit_tasks
+
+
+================================================================================
+6. RUN MODE D: STANDALONE SCHEDULING BENCHMARK (Mathematical Simulation)
+================================================================================
+# Run comparison of FIFO, Priority, and Round-Robin policies (makespan, wait time, throughput):
+cd ~/Desktop/RDC_project/1_Coordination_And_Scheduling/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+python3 src/multi_robot_coordination/multi_robot_coordination/simulation_runner.py
+
+
+================================================================================
+7. MANUAL TASK INJECTION VIA CLI
+================================================================================
+# Publish a single custom task to the coordinator at any time:
+# Format: "TASK_NAME,PRIORITY(1=Urgent, 2=High, 3=Normal),STATION_NAME"
+source /opt/ros/jazzy/setup.bash
+ros2 topic pub --once /submit_task std_msgs/msg/String "{data: 'TASK_VIP_01,1,STORAGE_STATION_B'}"
+
+
+================================================================================
+8. DIRECT ROS 2 ACTION COMMANDS VIA CLI
+================================================================================
+# Send goal directly to TurtleBot3 + OpenManipulator:
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/2_Gazebo_And_RViz_Simulation/ros2_ws/install/setup.bash
+ros2 action send_goal --feedback /navigate_and_pick multi_robot_interfaces/action/NavigateAndPick \
+  "{target_station_id: 'STORAGE_STATION_B', pickup_coordinates: [1.45, 1.20, 0.25], priority_level: 1}"
+
+# Send goal directly to UR5 Industrial Arm:
+source /opt/ros/jazzy/setup.bash
+source ~/Desktop/RDC_project/2_Gazebo_And_RViz_Simulation/ros2_ws/install/setup.bash
+ros2 action send_goal --feedback /ur5_pick_and_assemble multi_robot_interfaces/action/UR5PickAndPlace \
+  "{task_id: 'DIRECT_JOB_01', pickup_pose: [0.425, 0.0, 0.295], target_assembly_pose: [0.75, 0.20, 0.445], inspect_quality: true}"
+
+
+================================================================================
+9. USEFUL ROS 2 DEBUGGING COMMANDS
+================================================================================
+# List all active ROS 2 topics:
+ros2 topic list
+
+# Monitor coordination status updates:
+ros2 topic echo /workcell/coordination_status
+
+# List active actions:
+ros2 action list
+
+# List active services (including the mutex lock):
+ros2 service list
+================================================================================
